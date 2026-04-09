@@ -172,6 +172,21 @@
             p.pop();
         }
 
+        function drawShape(p, points, fillColor, strokeColor) {
+            p.push();
+            p.fill(...fillColor);
+            p.stroke(...strokeColor);
+            p.strokeWeight(2);
+            p.beginShape();
+            points.forEach(pt => p.vertex(pt.x, pt.y));
+            p.endShape(p.CLOSE);
+            p.pop();
+        }
+
+        function transformPoints(transformer) {
+            return baseShape.map(pt => transformer(pt));
+        }
+
         // --- (a) Identity Sketch ---
         new p5((p) => {
             let draggedPoint = null;
@@ -261,15 +276,12 @@
                 txVal.innerText = tx;
                 tyVal.innerText = ty;
 
-                // Draw Transformed Shape
-                p.fill(34, 197, 94, 150); // Green
-                p.stroke(21, 128, 61);
-                p.strokeWeight(2);
-                p.beginShape();
-                baseShape.forEach(pt => {
-                    p.vertex(pt.x, pt.y);
-                });
-                p.endShape(p.CLOSE);
+                const translatedShape = transformPoints((pt) => ({
+                    x: pt.x + tx,
+                    y: pt.y + ty
+                }));
+
+                drawShape(p, translatedShape, [34, 197, 94, 150], [21, 128, 61]);
             };
         });
 
@@ -297,15 +309,12 @@
                 let cosT = Math.cos(rad);
                 let sinT = Math.sin(rad);
 
-                // Draw Transformed Shape
-                p.fill(168, 85, 247, 150); // Purple
-                p.stroke(126, 34, 206);
-                p.strokeWeight(2);
-                p.beginShape();
-                baseShape.forEach(pt => {
-                    p.vertex(pt.x, pt.y);
-                });
-                p.endShape(p.CLOSE);
+                const rotatedShape = transformPoints((pt) => ({
+                    x: (pt.x * cosT) - (pt.y * sinT),
+                    y: (pt.x * sinT) + (pt.y * cosT)
+                }));
+
+                drawShape(p, rotatedShape, [168, 85, 247, 150], [126, 34, 206]);
             };
         });
 
@@ -334,15 +343,12 @@
                 sxVal.innerText = sx;
                 syVal.innerText = sy;
 
-                // Draw Transformed Shape
-                p.fill(234, 179, 8, 150); // Yellow
-                p.stroke(161, 98, 7);
-                p.strokeWeight(2);
-                p.beginShape();
-                baseShape.forEach(pt => {
-                    p.vertex(pt.x, pt.y);
-                });
-                p.endShape(p.CLOSE);
+                const scaledShape = transformPoints((pt) => ({
+                    x: pt.x * sx,
+                    y: pt.y * sy
+                }));
+
+                drawShape(p, scaledShape, [234, 179, 8, 150], [161, 98, 7]);
             };
         });
 
@@ -371,16 +377,12 @@
                 shxVal.innerText = shx;
                 shyVal.innerText = shy;
 
-                // Draw Transformed Shape
-                p.fill(236, 72, 153, 150); // Pink
-                p.stroke(190, 24, 93);
-                p.strokeWeight(2);
-                p.beginShape();
-                baseShape.forEach(pt => {
-                    // Math: x' = x + y*shx, y' = y + x*shy
-                    p.vertex(pt.x, pt.y);
-                });
-                p.endShape(p.CLOSE);
+                const shearedShape = transformPoints((pt) => ({
+                    x: pt.x + (pt.y * shx),
+                    y: pt.y + (pt.x * shy)
+                }));
+
+                drawShape(p, shearedShape, [236, 72, 153, 150], [190, 24, 93]);
             };
         });
 
@@ -405,15 +407,12 @@
                 let refX = refxCheck.checked;
                 let refY = refyCheck.checked;
 
-                // Draw Transformed Shape
-                p.fill(14, 165, 233, 150); // Cyan
-                p.stroke(3, 105, 161);
-                p.strokeWeight(2);
-                p.beginShape();
-                baseShape.forEach(pt => {
-                    p.vertex(pt.x, pt.y);
-                });
-                p.endShape(p.CLOSE);
+                const reflectedShape = transformPoints((pt) => ({
+                    x: refY ? -pt.x : pt.x,
+                    y: refX ? -pt.y : pt.y
+                }));
+
+                drawShape(p, reflectedShape, [14, 165, 233, 150], [3, 105, 161]);
             };
         });
     </script>
